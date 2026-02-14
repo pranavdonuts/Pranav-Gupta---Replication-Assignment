@@ -1,0 +1,96 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-repli
+> cation-kit/do/../log/graph-laus-trend.log
+  log type:  text
+ opened on:  11 Feb 2026, 20:49:43
+
+. 
+. /* --------------------------------------
+> 
+> This program plots trends in employment based on
+> LAUS data.
+> 
+> --------------------------------------- */
+. 
+. clear all
+
+. estimates clear
+
+. 
+. insheet using ../src/Laus_TN_popadj.csv
+(13 vars, 104 obs)
+
+. rename emp_rates emp_rate_S
+
+. 
+. keep if ym >= 2004 & ym <= 2007
+(68 observations deleted)
+
+. summ
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       vartn |          0
+        year |         36        2005    .8280787       2004       2006
+       month |         36        66.5    10.53565         49         84
+          ym |         36      2005.5    .8779738   2004.042   2006.958
+       blank |          0
+-------------+---------------------------------------------------------
+         emp |         36     2794018    46151.59    2744941    2881057
+         pop |         36     3898682    41914.65    3798748    4001973
+    emp_rate |         36    .7129719    .0088429   .7038277   .7298733
+        vars |          0
+         lfs |         36    5.27e+07    804489.2   5.16e+07   5.42e+07
+-------------+---------------------------------------------------------
+        emps |         36    4.99e+07      760780   4.88e+07   5.13e+07
+        pops |         36    6.87e+07     1089819   6.67e+07   7.04e+07
+  emp_rate_S |         36     .727612    .0016679   .7251696   .7321028
+
+. 
+. format emp_rate_S %12.3f
+
+. format emp_rate %12.3f
+
+. 
+. local tenncare_line = 2005 + (6/12)
+
+. 
+. local inv_golden_ratio = 2 / ( sqrt(5) + 1 )
+
+. graph set window fontface "Garamond" 
+
+. twoway ///
+>         (connected emp_rate_S ym, yaxis(1) lpattern(dash) lcolor(gray) mcolor(
+> red) msymbol(i)) ///
+>         (connected emp_rate   ym, yaxis(2) lpattern(solid) lcolor(gray) mcolor
+> (blue) msymbol(o) ) ///
+>         , ///
+>         ylabel(, nogrid angle(horizontal) axis(1)  ) ///
+>         ylabel(, nogrid angle(horizontal) axis(2)  ) ///
+>         scheme(s2mono)  ///
+>         xline(`tenncare_line') ///
+>         aspectratio(`inv_golden_ratio') ///
+>         graphregion(fcolor(white))  ///
+>         legend(off) ///
+>         yscale( nofextend ) xscale(nofextend) ///
+>         xtitle(" ") ///
+>         xlabel(2004(1)2007) ///
+>         ytitle("", axis(1)) ytitle("", axis(2)) ///
+>         ylabel(0.715(0.01)0.765, axis(1)) ylabel(0.69(0.01)0.74, axis(2)) ysca
+> le(axis(2) r(0.6898 0.7402))  yscale(axis(1) r(0.7148 0.7652))
+
+.   
+. graph save ../gph/laus-trends.gph , replace
+file ../gph/laus-trends.gph saved
+
+. 
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-repli
+> cation-kit/do/../log/graph-laus-trend.log
+  log type:  text
+ closed on:  11 Feb 2026, 20:49:43
+--------------------------------------------------------------------------------

@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../log/create-figures-extended.log
+  log type:  text
+ opened on:  13 Feb 2026, 22:30:40
+
+. 
+. /* --------------------------------------
+>    This program generates Parallel Trends figures 
+>    using the Border States control group.
+>    Replicates Figure 2 and Figure 3 (Panel A).
+>    --------------------------------------- */
+. 
+. * Load the dataset prepared by the DDD script
+. * (If this file is missing, run 'run-cps-tables-extended.do' first)
+. use "../dta/cps_DDD_FINAL.dta", clear
+
+. 
+. ************************************************************
+. ** 1. Define Control Groups
+. ************************************************************
+. * Border States: KY(21), VA(51), NC(37), GA(13), AL(1), MS(28), AR(5), MO(29)
+. gen byte border_states = (statefip==21 | statefip==51 | statefip==37 | statefip==13 | ///
+>                           statefip==1  | statefip==28 | statefip==5  | statefip==29)
+
+. 
+. gen byte tn = (statefip == 47)
+
+. 
+. ************************************************************
+. ** 2. Prepare Data for Plotting (Binning)
+. ************************************************************
+. preserve
+
+.     * RESTRICTION: Keep only Tennessee and Border States
+.     keep if tn == 1 | border_states == 1
+(2,268 observations deleted)
+
+.     
+.     * Focus on the relevant years for the plot (2000-2007)
+.     keep if year >= 2000 & year <= 2007
+(342 observations deleted)
+
+. 
+.     * Aggregate data into 2-year bins to match the paper's visuals
+.     * (e.g., 2000 & 2001 become "2000", 2002 & 2003 become "2002")
+.     replace year = 2 * floor(year / 2)
+(72 real changes made)
+
+.     
+.     * Collapse to get the mean for each group-year bin
+.     collapse (mean) any_public working, by(year tn)
+
+. 
+.     * Sort for clean line plotting
+.     sort tn year
+
+.     
+.     * Display the data in the console so you can sanity-check the numbers
+.     list
+
+     +--------------------------------+
+     | year   tn   any_pu~c   working |
+     |--------------------------------|
+  1. | 2000    0    .121914   .732725 |
+  2. | 2002    0    .130229   .704695 |
+  3. | 2004    0    .150955   .706258 |
+  4. | 2006    0    .145819   .704512 |
+  5. | 2000    1    .188041   .723233 |
+     |--------------------------------|
+  6. | 2002    1    .199457   .678734 |
+  7. | 2004    1       .199   .665207 |
+  8. | 2006    1    .174553     .7006 |
+     +--------------------------------+
+
+. 
+.     ************************************************************
+.     ** 3. Generate Figure 2 Equivalent (Public Insurance)
+.     ************************************************************
+.     local inv_golden_ratio = 2 / (sqrt(5) + 1)
+
+. 
+.     twoway ///
+>      (connected any_public year if tn == 0, lpattern(dash) lcolor(gray) mcolor(red) msymbol(i) yaxis(1)) ///
+>      (connected any_public year if tn == 1, lpattern(solid) lcolor(blue) mcolor(blue) msymbol(o) yaxis(2)) ///
+>      , /// 
+>         title("Public Insurance: TN vs. Border States") ///
+>         scheme(s2mono) ///
+>         graphregion(fcolor(white)) ///
+>         xline(2005) ///
+>         legend(order(2 "Tennessee" 1 "Border States") pos(6) cols(2)) ///
+>         yscale(nofextend) xscale(nofextend) ///
+>         aspectratio(`inv_golden_ratio') ///
+>         xlabel(2000 "2000-01" 2002 "2002-03" 2004 "2004-05" 2006 "2006-07") ///
+>         ytitle("Share Covered (Control)", axis(1)) ///
+>         ytitle("Share Covered (TN)", axis(2)) 
+
+.         
+.     graph save "../gph/fig2_insurance_border.gph", replace
+file ../gph/fig2_insurance_border.gph saved
+
+.     graph export "../gph/fig2_insurance_border.png", replace
+file /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../gph/fig2_insurance_border.png saved as PNG format
+
+. 
+.     ************************************************************
+.     ** 4. Generate Figure 3 Equivalent (Employment)
+.     ************************************************************
+.     twoway ///
+>      (connected working year if tn == 0, lpattern(dash) lcolor(gray) mcolor(red) msymbol(i) yaxis(1)) ///
+>      (connected working year if tn == 1, lpattern(solid) lcolor(blue) mcolor(blue) msymbol(o) yaxis(2)) ///
+>      , /// 
+>         title("Employment: TN vs. Border States") ///
+>         scheme(s2mono) ///
+>         graphregion(fcolor(white)) ///
+>         xline(2005) ///
+>         legend(order(2 "Tennessee" 1 "Border States") pos(6) cols(2)) ///
+>         yscale(nofextend) xscale(nofextend) ///
+>         aspectratio(`inv_golden_ratio') ///
+>         xlabel(2000 "2000-01" 2002 "2002-03" 2004 "2004-05" 2006 "2006-07") ///
+>         ytitle("Employment Rate (Control)", axis(1)) ///
+>         ytitle("Employment Rate (TN)", axis(2)) 
+
+.         
+.     graph save "../gph/fig3_working_border.gph", replace
+file ../gph/fig3_working_border.gph saved
+
+.     graph export "../gph/fig3_working_border.png", replace
+file /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../gph/fig3_working_border.png saved as PNG format
+
+. 
+. restore
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../log/create-figures-extended.log
+  log type:  text
+ closed on:  13 Feb 2026, 22:30:41
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,129 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../log/create-brfss-data-1990-2008.log
+  log type:  text
+ opened on:  11 Feb 2026, 20:20:43
+
+. 
+. /* --------------------------------------
+> This program compiles the BRFSS data 
+> from the raw files using relative paths.
+> --------------------------------------- */
+. 
+. clear all
+
+. estimates clear
+
+. 
+. ************************************************************
+. ** Updated programs to move around using relative paths
+. ************************************************************
+. 
+. capture program drop move_to_bulk
+
+. program define move_to_bulk
+  1.     * This points to the 'src' folder in your replication kit
+.     cd "../src"
+  2. end
+
+. 
+. capture program drop move_back 
+
+. program define move_back 
+  1.     * This brings you back to the 'do' folder
+.     cd "../do"
+  2. end
+
+. 
+. ************************************************************
+. ** Clean raw files
+. ************************************************************
+. 
+. forvalues year = 1990(1)2008 {
+  2. 
+.     clear
+  3.     
+.     * Navigate to where the .dct and raw data files are
+.     move_to_bulk
+  4.     
+.     * Check if the file exists before running to avoid errors
+.     capture confirm file "brfss`year'.dct"
+  5.     if _rc == 0 {
+  6.         infile using brfss`year'.dct
+  7.         move_back
+  8.         
+.         compress
+  9.         * Save to your local dta folder
+.         capture mkdir "../dta/brfss"
+ 10.         save "../dta/brfss/brfss_data_`year'", replace
+ 11.     }
+ 12.     else {
+ 13.         display as error "Warning: brfss`year'.dct not found in src folder. Skipping..."
+ 14.         move_back
+ 15.     }
+ 16. }
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1990.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1991.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1992.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1993.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1994.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1995.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1996.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1997.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1998.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss1999.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2000.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2001.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2002.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2003.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2004.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2005.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2006.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2007.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/src
+Warning: brfss2008.dct not found in src folder. Skipping...
+/Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-replication-kit/do/../log/create-brfss-data-1990-2008.log
+  log type:  text
+ closed on:  11 Feb 2026, 20:20:43
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

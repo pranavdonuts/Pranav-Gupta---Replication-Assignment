@@ -1,0 +1,554 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-repli
+> cation-kit/do/../log/analyze-brfss-data.log
+  log type:  text
+ opened on:  11 Feb 2026, 20:46:19
+
+. 
+. /* --------------------------------------
+> 
+> This program plots insurance coverage in
+> Tennessee based on the BRFSS.
+> 
+> --------------------------------------- */
+. 
+. clear all
+
+. estimates clear
+
+. 
+. clear
+
+. use ../dta/brfss_data_all.dta
+
+. 
+. tab year
+
+    year of |
+  interview |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       1990 |     81,557        2.08        2.08
+       1991 |     87,842        2.24        4.31
+       1992 |     96,217        2.45        6.76
+       1993 |    102,263        2.60        9.37
+       1994 |    105,793        2.69       12.06
+       1995 |    113,994        2.90       14.96
+       1996 |    124,085        3.16       18.12
+       1997 |    135,582        3.45       21.58
+       1998 |    149,342        3.80       25.38
+       1999 |    159,871        4.07       29.45
+       2000 |    183,695        4.68       34.13
+       2001 |    213,045        5.42       39.55
+       2002 |    247,329        6.30       45.85
+       2003 |    265,090        6.75       52.60
+       2004 |    303,871        7.74       60.34
+       2005 |    355,759        9.06       69.39
+       2006 |    354,870        9.04       78.43
+       2007 |    431,220       10.98       89.41
+       2008 |    414,366       10.55       99.96
+       2009 |      1,546        0.04      100.00
+------------+-----------------------------------
+      Total |  3,927,337      100.00
+
+. keep if year >= 2001 & year <= 2007
+(1,756,153 observations deleted)
+
+. keep if age>=21 & age<=64
+(582,088 observations deleted)
+
+. 
+. tab year if fips == 47, missing
+
+    year of |
+  interview |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2001 |      2,298       11.74       11.74
+       2002 |      2,430       12.42       24.16
+       2003 |      1,995       10.19       34.35
+       2004 |      2,798       14.30       48.65
+       2005 |      3,464       17.70       66.35
+       2006 |      3,180       16.25       82.60
+       2007 |      3,405       17.40      100.00
+------------+-----------------------------------
+      Total |     19,570      100.00
+
+. 
+. keep if ///
+>  fips==47 | fips==1 | fips==21 | fips==28 | fips==5 | ///
+>  fips==10 | fips==11 | fips==12 | fips==13 | fips==22 | ///
+>  fips==24 | fips==37 | fips==40 | fips==45 | fips==48 | ///
+>  fips==51 | fips==54
+(1,059,398 observations deleted)
+
+. 
+. desc, full
+
+Contains data from ../dta/brfss_data_all.dta
+ Observations:       529,698                  
+    Variables:            44                  20 Dec 2013 15:55
+--------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+--------------------------------------------------------------------------------
+fips            byte    %8.0g                 fips state code
+month           byte    %8.0g                 month of interview
+day             byte    %8.0g                 day of interview
+year            int     %8.0g                 year of interview
+adults          byte    %8.0g                 # adults in household
+phys_act        byte    %8.0g                 activity level, 1=sedentary,
+                                                2=irregular, 3=regular,
+                                                4=vigorous
+age             byte    %8.0g                 age in years
+marital         byte    %8.0g                 marital status 1=marr 2=widow
+                                                3=div 4=sep 5=nev mar 6=couple
+educ            byte    %8.0g                 education, 1= <high school, 2= hs
+                                                grad/some college 3= college
+                                                grad
+employ          byte    %8.0g                 employment, 1=wages,
+                                                2=self-employ, 3=jobless<1 yr,
+                                                4=jobless>1 yr, 5=homemaker,
+income93        byte    %8.0g                 family income, 1993 coding
+weight          int     %8.0g                 weight in pounds
+height          int     %8.0g                 height in inches
+county          int     %8.0g                 county of residence
+sex             byte    %8.0g                 sex, 1=male, 2=female
+smoke93         byte    %8.0g                 smoking status, 1=all, 2=some,
+                                                3=former, 4=never, 9=DK
+race8           byte    %8.0g                 race/ethnicity 01=w(NH), 02=b(NH),
+                                                03=white hispanic, 04=black
+                                                hispanic, 05=othe
+fruit_veggie    byte    %8.0g                 fruit & vegetable index, 1=once a
+                                                day or never, 2=one to three
+                                                times a day, 3=th
+alcoholic       byte    %8.0g                 chronic drinking, 1=not at risk,
+                                                2=at risk, 9=DK
+totaldrinks     int     %8.0g                 total number of drinks per month
+finalwgt        double  %10.0g                final weight
+checkup         byte    %8.0g                 last routine checkup, 1=within
+                                                past year, 2=past two years,
+                                                3=past five years, 4
+insurance       byte    %8.0g                 have any kind of health care plan,
+                                                1=yes, 2=no, 7=don't know,
+                                                9=refused
+hospins         byte    %8.0g                 health insurance covers hospital
+                                                visits, 1=all, 2=most, 3=some,
+                                                4=none, 7=don't
+docins          byte    %8.0g                 health insurance covers doctor
+                                                visits, 1=all, 2=most, 3=some,
+                                                4=none, 7=don't kn
+preventins      byte    %8.0g                 health insurance covers
+                                                preventitive, 1=all, 2=most,
+                                                3=some, 4=none, 7=don't kno
+affordcare      byte    %8.0g                 in the last year could you not
+                                                afford a doctor, 1=yes, 2=no,
+                                                7=don't know, 9=ref
+srhealth        byte    %8.0g                 self reported health, 1=excellent
+                                                to 5=poor
+phys_poor       byte    %8.0g                 # days per month poor physical
+                                                health
+mental_poor     byte    %8.0g                 # days per month poor mental
+                                                health
+insgap          byte    %8.0g                 how long since you last had
+                                                coverage, 1=1-6 mos, 2=7-12
+                                                months, 3=1-2 years, 4=2
+kids            byte    %8.0g                 # of kids in household, 3=3 or
+                                                more
+exercise        byte    %8.0g                 exercise in past month, 1=yes,
+                                                2=no, 7=DK, 9=refuse
+kids_under_5    byte    %8.0g                 # of kids in household under 5
+kids5_12        byte    %8.0g                 kids between 5 and 12
+kids13_17       byte    %8.0g                 kids between 13 and 17
+income94        byte    %8.0g                 family income, post 1994 coding
+smoke94         byte    %8.0g                 smoking status, 1=all, 2=some,
+                                                3=former, 4=never, 9=DK
+race4           byte    %8.0g                 race/ethnicity 1=w(NH), 2=b(NH),
+                                                3=Hispanic 4=other(NH) 5=DK
+smoke_status    byte    %8.0g                 smoking status, 1=all, 2=some,
+                                                3=former, 4=never, 9=DK
+race5           byte    %8.0g                 race/ethnicity 1=w(NH), 2=b(NH),
+                                                3=o(nh) 4=mixed(NH) 5=Hispanic
+persdoc         byte    %8.0g                 person has personal doctor, 1=only
+                                                one, 2=more than one, 3=no,
+                                                7=Dk, 9=refused
+active_duty     byte    %8.0g                 military duty, 1=yes, 2=national
+                                                guard or reserves
+satisfied       byte    %8.0g                 satisfied with your life, 1=very
+                                                satisfied, 2=satisfied,
+                                                3=dissatisfied, 4=very
+--------------------------------------------------------------------------------
+Sorted by: 
+     Note: Dataset has changed since last saved.
+
+. 
+. gen mhealth = (mental_poor > 0 & mental_poor < 77)
+
+. 
+. replace satisfied = . if satisfied > 4
+(1,834 real changes made, 1,834 to missing)
+
+. 
+. replace employ = (employ == 1) if employ < .
+(214,251 real changes made)
+
+. 
+. replace srhealth = . if srhealth > 5
+(1,624 real changes made, 1,624 to missing)
+
+. forvalues s=1/4 {
+  2.          gen srhealth`s' = (srhealth <= `s') if srhealth < .
+  3. }
+(1,629 missing values generated)
+(1,629 missing values generated)
+(1,629 missing values generated)
+(1,629 missing values generated)
+
+. 
+. gen persdoc1 = .
+(529,698 missing values generated)
+
+. replace persdoc1 = 0 if persdoc == 3
+(76,429 real changes made)
+
+. replace persdoc1 = 1 if persdoc < 3
+(339,088 real changes made)
+
+. 
+. gen persdoc2 = .
+(529,698 missing values generated)
+
+. replace persdoc2 = 0 if persdoc == 3 | persdoc == 2
+(111,855 real changes made)
+
+. replace persdoc2 = 1 if persdoc < 2
+(303,662 real changes made)
+
+. 
+. 
+. **
+. ** Main sample restriction: drop college educated
+. **
+. drop if educ == 6
+(0 observations deleted)
+
+. 
+. 
+. rename insurance insurance_orig
+
+. gen insurance = .
+(529,698 missing values generated)
+
+. replace insurance = 0 if insurance_orig == 2
+(95,776 real changes made)
+
+. replace insurance = 1 if insurance_orig == 1
+(432,970 real changes made)
+
+. drop insurance_orig
+
+. 
+. keep if year >= 2000
+(0 observations deleted)
+
+. 
+. collapse insurance [aw=finalwgt], by(fips year month)
+
+. 
+. gen tn = (fips==47)
+
+. replace fips = tn
+(1,404 real changes made)
+
+. 
+. collapse insurance, by(fips tn year month) fast
+
+. 
+. gen ym = year + month/12
+
+.  rename insurance insurance_orig
+
+.  sort fips ym
+
+.  gen insurance = insurance_orig
+
+. 
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2] + insurance_or
+> ig[_n-3] + insurance_orig[_n-4] + insurance_orig[_n-5] + insurance_orig[_n-6] 
+> + insurance_orig[_n-7])/8
+(167 real changes made, 14 to missing)
+
+. 
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2] + insurance_or
+> ig[_n-3] + insurance_orig[_n-4] + insurance_orig[_n-5] + insurance_orig[_n-6])
+> /7 if year == 2006 & month == 2 & tn == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2] + insurance_or
+> ig[_n-3] + insurance_orig[_n-4] + insurance_orig[_n-5])/6 if year == 2006 & mo
+> nth == 1 & tn == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2] + insurance_or
+> ig[_n-3] + insurance_orig[_n-4])/5 if year == 2005 & month == 12 & tn == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2] + insurance_or
+> ig[_n-3])/4 if year == 2005 & month == 11 & tn == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1] + insurance_orig[_n-2])/3 if year == 
+> 2005 & month == 10 & tn == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig + insurance_orig[_n-1])/2 if year == 2005 & month == 9 & tn 
+> == 1
+(1 real change made)
+
+.  by fips: replace insurance = ///
+>   (insurance_orig)/1 if year == 2005 & month == 8 & tn == 1
+(1 real change made)
+
+. 
+. keep if year >= 2003
+(48 observations deleted)
+
+. 
+. list
+
+     +-----------------------------------------------------------+
+     | fips   month   year   tn   insura~g         ym   insura~e |
+     |-----------------------------------------------------------|
+  1. |    0       1   2003    0   .8116201   2003.083   .8092558 |
+  2. |    0       2   2003    0   .8176571   2003.167   .8110781 |
+  3. |    0       3   2003    0   .8015848    2003.25   .8094947 |
+  4. |    0       4   2003    0   .8040172   2003.333   .8085356 |
+  5. |    0       5   2003    0   .7912729   2003.417   .8053957 |
+     |-----------------------------------------------------------|
+  6. |    0       6   2003    0   .8017847     2003.5   .8053868 |
+  7. |    0       7   2003    0   .8033397   2003.583   .8051099 |
+  8. |    0       8   2003    0   .7922421   2003.667   .8029398 |
+  9. |    0       9   2003    0   .7980422    2003.75   .8012426 |
+ 10. |    0      10   2003    0   .8028247   2003.833   .7993885 |
+     |-----------------------------------------------------------|
+ 11. |    0      11   2003    0   .8023273   2003.917   .7994813 |
+ 12. |    0      12   2003    0   .8251914       2004   .8021281 |
+ 13. |    0       1   2004    0   .8064212   2004.083   .8040217 |
+ 14. |    0       2   2004    0   .8030083   2004.167   .8041746 |
+ 15. |    0       3   2004    0   .8018363    2004.25   .8039867 |
+     |-----------------------------------------------------------|
+ 16. |    0       4   2004    0   .8101715   2004.333   .8062279 |
+ 17. |    0       5   2004    0   .7993482   2004.417   .8063911 |
+ 18. |    0       6   2004    0   .7976723     2004.5    .805747 |
+ 19. |    0       7   2004    0   .8045242   2004.583   .8060217 |
+ 20. |    0       8   2004    0    .803968   2004.667   .8033687 |
+     |-----------------------------------------------------------|
+ 21. |    0       9   2004    0   .8074168    2004.75   .8034932 |
+ 22. |    0      10   2004    0   .8028007   2004.833   .8034673 |
+ 23. |    0      11   2004    0   .8104486   2004.917   .8045438 |
+ 24. |    0      12   2004    0   .8048475       2005   .8038783 |
+ 25. |    0       1   2005    0    .807117   2005.083   .8048494 |
+     |-----------------------------------------------------------|
+ 26. |    0       2   2005    0   .8101985   2005.167   .8064152 |
+ 27. |    0       3   2005    0   .7906986    2005.25    .804687 |
+ 28. |    0       4   2005    0   .8050023   2005.333   .8048162 |
+ 29. |    0       5   2005    0   .8064044   2005.417   .8046897 |
+ 30. |    0       6   2005    0   .8011587     2005.5   .8044844 |
+     |-----------------------------------------------------------|
+ 31. |    0       7   2005    0   .7928706   2005.583   .8022872 |
+ 32. |    0       8   2005    0   .8044317   2005.667   .8022352 |
+ 33. |    0       9   2005    0   .8221061    2005.75   .8041089 |
+ 34. |    0      10   2005    0   .7983497   2005.833   .8026277 |
+ 35. |    0      11   2005    0   .8190722   2005.917   .8061745 |
+     |-----------------------------------------------------------|
+ 36. |    0      12   2005    0   .8168578       2006   .8076564 |
+ 37. |    0       1   2006    0   .8215498   2006.083   .8095496 |
+ 38. |    0       2   2006    0   .8025313   2006.167   .8097211 |
+ 39. |    0       3   2006    0   .8102024    2006.25   .8118876 |
+ 40. |    0       4   2006    0    .807969   2006.333   .8123298 |
+     |-----------------------------------------------------------|
+ 41. |    0       5   2006    0   .7880202   2006.417   .8080691 |
+ 42. |    0       6   2006    0   .8117059     2006.5   .8097386 |
+ 43. |    0       7   2006    0    .805793   2006.583   .8080787 |
+ 44. |    0       8   2006    0   .8034279   2006.667   .8063999 |
+ 45. |    0       9   2006    0   .8304517    2006.75   .8075127 |
+     |-----------------------------------------------------------|
+ 46. |    0      10   2006    0   .8042882   2006.833   .8077323 |
+ 47. |    0      11   2006    0   .8169191   2006.917   .8085719 |
+ 48. |    0      12   2006    0   .8238329       2007   .8105549 |
+ 49. |    0       1   2007    0   .8171009   2007.083     .81419 |
+ 50. |    0       2   2007    0   .8191707   2007.167   .8151231 |
+     |-----------------------------------------------------------|
+ 51. |    0       3   2007    0   .7938388    2007.25   .8136288 |
+ 52. |    0       4   2007    0   .7966703   2007.333   .8127841 |
+ 53. |    0       5   2007    0   .8067763   2007.417   .8098246 |
+ 54. |    0       6   2007    0   .8152679     2007.5   .8111971 |
+ 55. |    0       7   2007    0    .814081   2007.583   .8108423 |
+     |-----------------------------------------------------------|
+ 56. |    0       8   2007    0   .8275536   2007.667   .8113074 |
+ 57. |    0       9   2007    0   .8150585    2007.75   .8110521 |
+ 58. |    0      10   2007    0   .8023742   2007.833   .8089526 |
+ 59. |    0      11   2007    0   .8044372   2007.917   .8102773 |
+ 60. |    0      12   2007    0     .80599       2008   .8114423 |
+     |-----------------------------------------------------------|
+ 61. |    1       1   2003    1   .8271942   2003.083   .8530156 |
+ 62. |    1       2   2003    1   .9024159   2003.167   .8614813 |
+ 63. |    1       3   2003    1   .9176834    2003.25   .8672315 |
+ 64. |    1       4   2003    1   .8199758   2003.333   .8616357 |
+ 65. |    1       5   2003    1    .892787   2003.417   .8658326 |
+     |-----------------------------------------------------------|
+ 66. |    1       6   2003    1    .855277     2003.5   .8680122 |
+ 67. |    1       7   2003    1   .8510564   2003.583   .8625674 |
+ 68. |    1       8   2003    1   .8635309   2003.667   .8662401 |
+ 69. |    1       9   2003    1    .825999    2003.75   .8660907 |
+ 70. |    1      10   2003    1   .8752998   2003.833   .8627012 |
+     |-----------------------------------------------------------|
+ 71. |    1      11   2003    1    .902876   2003.917   .8608502 |
+ 72. |    1      12   2003    1   .7760298       2004    .855357 |
+ 73. |    1       2   2004    1   .8787298   2004.167   .8535998 |
+ 74. |    1       3   2004    1   .8836531    2004.25   .8571469 |
+ 75. |    1       4   2004    1   .8362387   2004.333   .8552946 |
+     |-----------------------------------------------------------|
+ 76. |    1       5   2004    1   .8657414   2004.417    .855571 |
+ 77. |    1       6   2004    1   .8286902     2004.5   .8559074 |
+ 78. |    1       7   2004    1   .8398694   2004.583   .8514786 |
+ 79. |    1       8   2004    1   .8940552   2004.667    .850376 |
+ 80. |    1       9   2004    1   .8665822    2004.75    .861695 |
+     |-----------------------------------------------------------|
+ 81. |    1      10   2004    1   .8760735   2004.833    .861363 |
+ 82. |    1      11   2004    1   .9205096   2004.917     .86597 |
+ 83. |    1      12   2004    1   .8438805       2005   .8669252 |
+ 84. |    1       1   2005    1   .8119332   2005.083   .8601992 |
+ 85. |    1       2   2005    1   .8605035   2005.167   .8641759 |
+     |-----------------------------------------------------------|
+ 86. |    1       3   2005    1    .901271    2005.25   .8718511 |
+ 87. |    1       4   2005    1   .9262046   2005.333   .8758698 |
+ 88. |    1       5   2005    1   .8416028   2005.417   .8727474 |
+ 89. |    1       6   2005    1   .9365041     2005.5   .8803012 |
+ 90. |    1       7   2005    1   .8564777   2005.583   .8722972 |
+     |-----------------------------------------------------------|
+ 91. |    1       8   2005    1   .8196493   2005.667   .8196493 |
+ 92. |    1       9   2005    1   .8050667    2005.75    .812358 |
+ 93. |    1      10   2005    1    .842217   2005.833    .822311 |
+ 94. |    1      11   2005    1   .8412352   2005.917    .827042 |
+ 95. |    1      12   2005    1   .8179752       2006   .8252287 |
+     |-----------------------------------------------------------|
+ 96. |    1       1   2006    1   .8797133   2006.083   .8343095 |
+ 97. |    1       2   2006    1   .8735367   2006.167   .8399134 |
+ 98. |    1       3   2006    1   .8871828    2006.25    .845822 |
+ 99. |    1       4   2006    1   .7607165   2006.333   .8384554 |
+100. |    1       5   2006    1   .7531454   2006.417   .8319653 |
+     |-----------------------------------------------------------|
+101. |    1       6   2006    1   .9196763     2006.5   .8416477 |
+102. |    1       7   2006    1    .799852   2006.583   .8364748 |
+103. |    1       8   2006    1   .8821563   2006.667   .8444974 |
+104. |    1       9   2006    1   .8771291    2006.75   .8441744 |
+105. |    1      10   2006    1   .8500236   2006.833   .8412353 |
+     |-----------------------------------------------------------|
+106. |    1      11   2006    1   .8205332   2006.917    .832904 |
+107. |    1      12   2006    1   .8647807       2007    .845912 |
+108. |    1       1   2007    1   .7821473   2007.083   .8495373 |
+109. |    1       2   2007    1   .8320099   2007.167    .838579 |
+110. |    1       3   2007    1   .8719776    2007.25   .8475947 |
+     |-----------------------------------------------------------|
+111. |    1       4   2007    1    .869973   2007.333   .8460718 |
+112. |    1       5   2007    1   .8286177   2007.417   .8400078 |
+113. |    1       6   2007    1   .8257712     2007.5   .8369763 |
+114. |    1       7   2007    1   .8442856   2007.583   .8399454 |
+115. |    1       8   2007    1   .7853495   2007.667   .8300164 |
+     |-----------------------------------------------------------|
+116. |    1       9   2007    1   .8050251    2007.75   .8328762 |
+117. |    1      10   2007    1   .8702875   2007.833   .8376609 |
+118. |    1      11   2007    1   .8854589   2007.917   .8393461 |
+119. |    1      12   2007    1   .8205839       2008   .8331724 |
+     +-----------------------------------------------------------+
+
+. 
+. summ insurance if ym <= 2005.5 & ym >= 2004.5 & tn == 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   insurance |         13    .8645277    .0090748    .850376   .8803012
+
+. global pre = r(mean)
+
+. 
+. summ insurance if ym >= 2006 & tn == 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   insurance |         25     .838973     .006001   .8252287   .8495373
+
+. global post = r(mean)
+
+. 
+. summ insurance if year == 2005 & month == 9 & tn == 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   insurance |          1     .812358           .    .812358    .812358
+
+. global init = r(mean)
+
+. 
+. gen pre = $pre if ym <= 2005.5 & ym >= 2004.5
+(93 missing values generated)
+
+. gen post = $post if ym >= 2006
+(69 missing values generated)
+
+. 
+. di $pre-$init
+.05216964
+
+. di $post-$init
+.02661495
+
+. di ($post-$init)/($pre-$init)
+.51016157
+
+. 
+. local tenncare_line = 2005 + (7/12)
+
+. 
+. format insurance %12.2f
+
+. local inv_golden_ratio = 2 / ( sqrt(5) + 1 )
+
+. graph set window fontface "Garamond" 
+
+. twoway ///
+>         (connected insurance ym if tn == 1 & year >= 2004 & year <= 2006 , lpa
+> ttern(solid) lcolor(gray) mcolor(blue) msymbol(o) ) ///
+>         (connected insurance ym if tn == 0 & year >= 2004 & year <= 2006 , lpa
+> ttern(dash) lcolor(gray)  mcolor(red) msymbol(i) ) ///
+>         , ///
+>         graphregion(fcolor(white)) ///
+>         ylabel(, nogrid angle(horizontal)  ) ///
+>         scheme(s2mono)  ///
+>         aspectratio(`inv_golden_ratio') ///
+>         xline(`tenncare_line') ///
+>         graphregion(fcolor(white))  ///
+>         legend(off) ///
+>         yscale( nofextend ) xscale(nofextend) ///
+>         xlabel(2004(1)2007) ///
+>         xtitle(" ") ytitle(" ") ///
+>         ylabel(0.78(0.02)0.90) yscale(r(0.7798 0.9002))
+
+. graph save ../gph/brfss_insurance-trimmed.gph, replace
+file ../gph/brfss_insurance-trimmed.gph saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pranavgupta/Documents/ECON 580/Pranav-copy-rep-kit/ggn-repli
+> cation-kit/do/../log/analyze-brfss-data.log
+  log type:  text
+ closed on:  11 Feb 2026, 20:46:21
+--------------------------------------------------------------------------------
